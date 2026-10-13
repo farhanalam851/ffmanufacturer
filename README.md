@@ -84,7 +84,7 @@ Vercel detects Django from `manage.py`, runs `collectstatic` and serves `/static
    python manage.py createsuperuser
    ```
    (The cache table makes login and form rate limits work across serverless instances.)
-5. **Deploy:** push to GitHub and import the repo in Vercel (root directory = this folder), or run `vercel deploy`. `vercel.json` pins the function to Mumbai (`bom1`); put your database in a nearby region.
+5. **Deploy:** push to GitHub and import the repo in Vercel (root directory = this folder), or run `vercel deploy`. `vercel.json` pins the function to Seoul (`icn1`) to sit next to a Supabase Seoul database; if your database is in another region, change it to the nearest Vercel region.
 6. **After the first deploy:** in Razorpay add the webhook `https://yourdomain/payment/webhook/`, then add the domain to Google Search Console and submit `/sitemap.xml`.
 
 ## Security built in

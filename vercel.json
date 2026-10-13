@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "regions": ["bom1"],
+  "regions": ["icn1"],
   "crons": [{ "path": "/healthz/", "schedule": "0 6 * * *" }],
   "functions": {
     "config/wsgi.py": { "maxDuration": 30 }
