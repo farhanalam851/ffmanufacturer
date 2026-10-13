@@ -1,8 +1,9 @@
 """Settings for the F.F Manufacturer website. Secrets come from environment variables."""
 import os
 from pathlib import Path
-from urllib.parse import urlparse
 from django.core.exceptions import ImproperlyConfigured
+
+from .dburl import parse_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -83,15 +84,11 @@ TEMPLATES = [
 
 # Database: DATABASE_URL (Vercel Postgres / Neon / Supabase) > DB_* variables > local SQLite.
 if env("DATABASE_URL"):
-    _u = urlparse(env("DATABASE_URL"))
+    _db = parse_database_url(env("DATABASE_URL"))
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": _u.path.lstrip("/"),
-            "USER": _u.username,
-            "PASSWORD": _u.password,
-            "HOST": _u.hostname,
-            "PORT": _u.port or 5432,
+            **_db,
             "CONN_MAX_AGE": 0,  # serverless: do not hold connections open
             "DISABLE_SERVER_SIDE_CURSORS": True,  # needed behind a transaction pooler
             "OPTIONS": {"sslmode": env("DB_SSLMODE", "require")},

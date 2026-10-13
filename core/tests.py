@@ -46,3 +46,17 @@ class SecurityTests(TestCase):
     def test_healthz_checks_database(self):
         r = self.client.get("/healthz/")
         self.assertEqual((r.status_code, r.content), (200, b"ok"))
+
+
+class DatabaseUrlTests(TestCase):
+    def test_special_characters_in_password(self):
+        from config.dburl import parse_database_url
+        d = parse_database_url("postgresql://postgres.abc:pa@ss#w/rd%21@aws-0.pooler.supabase.com:6543/postgres")
+        self.assertEqual((d["USER"], d["PASSWORD"], d["HOST"], d["PORT"], d["NAME"]),
+                         ("postgres.abc", "pa@ss#w/rd!", "aws-0.pooler.supabase.com", 6543, "postgres"))
+
+    def test_placeholder_is_rejected_with_clear_message(self):
+        from django.core.exceptions import ImproperlyConfigured
+        from config.dburl import parse_database_url
+        with self.assertRaisesMessage(ImproperlyConfigured, "placeholder"):
+            parse_database_url("postgresql://u:[YOUR-PASSWORD]@h:6543/postgres")
