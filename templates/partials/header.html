@@ -1,0 +1,44 @@
+{% load static %}
+<div class="topbar no-print"><div class="container">
+  <span class="hide-sm">Wholesale prices for verified businesses · GST invoice on every order</span>
+  <span class="tb-links">
+    {% if SITE %}<a href="tel:+91{{ SITE.phone_primary }}">{{ SITE.phone_primary }}</a>{% if SITE.phone_secondary %}<a href="tel:+91{{ SITE.phone_secondary }}">{{ SITE.phone_secondary }}</a>{% endif %}{% endif %}
+    <a href="{% url 'orders:track' %}">Track order</a>
+  </span>
+</div></div>
+<header class="site-header no-print"><div class="container">
+  <button class="icon-btn nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <a class="logo" href="{% url 'core:home' %}" aria-label="F.F Manufacturer home">
+    <svg viewBox="0 0 46 34" fill="none" aria-hidden="true"><rect x="2" y="3" width="42" height="28" rx="5" stroke="#cfa65a" stroke-width="3"/><path d="M23 3v28" stroke="#cfa65a" stroke-width="3"/><circle cx="12" cy="17" r="2.2" fill="#cfa65a"/><circle cx="34" cy="17" r="2.2" fill="#cfa65a"/></svg>
+    <span>F.F Manufacturer<small>Leather belts · Jajmau, Kanpur</small></span>
+  </a>
+  <nav class="nav" id="site-nav" aria-label="Main">
+    <form class="head-search m-search" action="{% url 'store:catalog' %}" role="search"><input type="search" name="q" placeholder="Search belts" aria-label="Search belts"><button aria-label="Search">Go</button></form>
+    <a href="{% url 'store:catalog' %}"{% if request.resolver_match.url_name == 'catalog' %} aria-current="page"{% endif %}>Shop all</a>
+    <a href="{% url 'store:catalog' %}?gender=men">Men</a>
+    <a href="{% url 'store:catalog' %}?gender=women">Women</a>
+    <a href="{% url 'core:bulk_enquiry' %}">Wholesale</a>
+    <a href="{% url 'core:about' %}">About</a>
+    <a href="{% url 'core:contact' %}">Contact</a>
+  </nav>
+  <div class="head-tools">
+    <form class="head-search" action="{% url 'store:catalog' %}" role="search"><input type="search" name="q" placeholder="Search belts" aria-label="Search belts"><button aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button></form>
+    {% if user.is_authenticated %}
+      <a class="icon-btn" href="{% url 'store:wishlist' %}" aria-label="Wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.4-9.5 9-9.5 9z"/></svg></a>
+      <div class="acct">
+        <button class="icon-btn" type="button" aria-haspopup="true" aria-label="Account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg></button>
+        <div class="acct-menu">
+          <a href="{% url 'accounts:dashboard' %}">My dashboard</a>
+          <a href="{% url 'orders:list' %}">My orders</a>
+          <a href="{% url 'accounts:profile' %}">Profile</a>
+          <a href="{% url 'accounts:addresses' %}">Addresses</a>
+          {% if user.is_staff %}<a href="{% url 'dashboard:overview' %}">Store dashboard</a><a href="{% url 'admin:index' %}">Admin panel</a>{% endif %}
+          <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Log out</button></form>
+        </div>
+      </div>
+    {% else %}
+      <a class="icon-btn" href="{% url 'accounts:login' %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg><span>Log in</span></a>
+    {% endif %}
+    <a class="icon-btn" href="{% url 'orders:cart' %}" aria-label="Cart, {{ CART_COUNT }} items"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 4h2l2.4 11h10.2L20 7H6"/><circle cx="9" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></svg>{% if CART_COUNT %}<span class="cart-count">{{ CART_COUNT }}</span>{% endif %}</a>
+  </div>
+</div></header>

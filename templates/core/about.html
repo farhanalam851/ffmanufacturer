@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}About us | F.F Manufacturer{% endblock %}
+{% block description %}Meet F.F Manufacturer, a leather belt maker in Jajmau, Kanpur. Our workshop cuts, stitches and finishes belts for men and women, retail and wholesale.{% endblock %}
+{% block content %}
+<div class="container page-head"><h1>About F.F Manufacturer</h1></div>
+<div class="container" style="display:grid;grid-template-columns:1.1fr .9fr;gap:3rem;align-items:center;padding-bottom:3rem">
+  <div class="prose">
+    <p>We make leather belts for men and women in Jajmau, Kanpur, the heart of India's leather trade. Our range covers formal dress belts, textured and stitched belts, casual vintage-finish belts, braided belts, and women's python-print, stretch and colour belts.</p>
+    <p>We sell directly to individual buyers and in bulk to retailers, uniform suppliers and corporate gifting buyers. Every order ships with a GST invoice.</p>
+    <h2>Visit or call</h2>
+    <p>{{ SITE.address }}<br>Phone: <a href="tel:+91{{ SITE.phone_primary }}">{{ SITE.phone_primary }}</a>{% if SITE.phone_secondary %}, <a href="tel:+91{{ SITE.phone_secondary }}">{{ SITE.phone_secondary }}</a>{% endif %}</p>
+    <a class="btn" href="{% url 'core:bulk_enquiry' %}">Send a wholesale enquiry</a>
+  </div>
+  <div class="photo-frame stitch"><img src="{% static 'seed/textured-stitched.webp' %}" alt="Black stitched leather belts with steel buckles" width="496" height="587" style="aspect-ratio:1;" loading="lazy" decoding="async"></div>
+</div>
+<style>@media(max-width:820px){.container[style*="grid-template-columns:1.1fr"]{grid-template-columns:1fr!important}}</style>
+{% endblock %}

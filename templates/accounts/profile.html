@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Profile | F.F Manufacturer{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block description %}Manage your F.F Manufacturer profile.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block content %}
+<div class="container dash">{% include "partials/dash_nav.html" %}
+  <div><h1 style="font-size:2rem">Your profile</h1>
+    <p class="muted">Signed in as {{ user.email }}. {% if user.is_business %}Changing your GSTIN sends it for re-verification.{% endif %}</p>
+    <form method="post" class="card" style="max-width:560px" novalidate>{% csrf_token %}{% include "partials/form_fields.html" %}<button class="btn" type="submit">Save profile</button></form>
+  </div>
+</div>
+{% endblock %}

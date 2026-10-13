@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Order {{ order.order_number }} | Store dashboard{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block content %}
+<div class="container dash">{% include "dashboard/_nav.html" %}
+  <div class="stack">
+    <div class="section-head"><div><h1 style="font-size:2rem;margin:0">Order {{ order.order_number }}</h1><span class="muted">{{ order.created|date:"j F Y, g:i a" }} · {{ order.user.email }}</span></div><a class="btn btn-ghost btn-sm" href="{% url 'orders:invoice' order.order_number %}">Open invoice</a></div>
+    <form method="post" class="card">{% csrf_token %}
+      <h2 style="font-size:1.2rem">Update order</h2>
+      <div class="form-grid">
+        <div class="field"><label for="st">Order status</label><select id="st" name="status">{% for k, v in statuses %}<option value="{{ k }}" {% if k == order.status %}selected{% endif %}>{{ v }}</option>{% endfor %}</select><div class="help">Cancelling returns the stock.</div></div>
+        <div class="field"><label for="ps">Payment status</label><select id="ps" name="payment_status">{% for k, v in pay_statuses %}<option value="{{ k }}" {% if k == order.payment_status %}selected{% endif %}>{{ v }}</option>{% endfor %}</select></div>
+        <div class="field"><label for="co">Courier</label><input id="co" name="courier" value="{{ order.courier }}" maxlength="60"></div>
+        <div class="field"><label for="tn">Tracking number</label><input id="tn" name="tracking_number" value="{{ order.tracking_number }}" maxlength="60"></div>
+      </div><button class="btn" type="submit">Save changes</button>
+      <p class="small muted" style="margin:.7rem 0 0">Moving to Shipped emails the customer the tracking details.</p>
+    </form>
+    <div class="table-wrap"><table class="data"><thead><tr><th>Item</th><th>Size</th><th class="num">Price</th><th class="num">Qty</th><th class="num">Total</th></tr></thead><tbody>
+      {% for i in order.items.all %}<tr><td>{{ i.name }}<br><span class="small muted">{{ i.sku }}</span></td><td>{{ i.size }}</td><td class="num">₹{{ i.unit_price|intcomma }}</td><td class="num">{{ i.quantity }}</td><td class="num">₹{{ i.line_total|intcomma }}</td></tr>{% endfor %}</tbody></table></div>
+    <div class="two-col"><div class="card"><h3>Ship to</h3><p style="margin:0">{{ order.ship_name }}<br>{{ order.ship_line1 }}{% if order.ship_line2 %}, {{ order.ship_line2 }}{% endif %}<br>{{ order.ship_city }}, {{ order.ship_state }} {{ order.ship_pincode }}<br>{{ order.ship_phone }}{% if order.company_name %}<br><b>{{ order.company_name }}</b>{% endif %}{% if order.gstin %}<br>GSTIN {{ order.gstin }}{% endif %}</p>{% if order.notes %}<p class="small" style="margin:.7rem 0 0"><b>Customer note:</b> {{ order.notes }}</p>{% endif %}</div>
+    <div class="card"><h3>Money</h3><div class="summary" style="position:static"><div class="row"><span>Taxable value</span><span>₹{{ order.taxable_value|intcomma }}</span></div>{% if order.is_intra_state %}<div class="row"><span>CGST</span><span>₹{{ order.cgst|intcomma }}</span></div><div class="row"><span>SGST</span><span>₹{{ order.sgst|intcomma }}</span></div>{% else %}<div class="row"><span>IGST</span><span>₹{{ order.igst|intcomma }}</span></div>{% endif %}<div class="row"><span>Shipping + COD</span><span>₹{{ order.handling_total|intcomma }}</span></div><div class="row total"><span>Total</span><span>₹{{ order.total|intcomma }}</span></div></div>{% if order.razorpay_payment_id %}<p class="small muted" style="margin:.7rem 0 0">Razorpay payment {{ order.razorpay_payment_id }}</p>{% endif %}</div></div>
+  </div>
+</div>
+{% endblock %}

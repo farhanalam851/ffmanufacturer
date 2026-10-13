@@ -1,0 +1,12 @@
+<nav class="dash-nav" aria-label="Store management">
+  {% with n=request.resolver_match.url_name %}
+  <a href="{% url 'dashboard:overview' %}" {% if n == 'overview' %}aria-current="page"{% endif %}>Overview</a>
+  <a href="{% url 'dashboard:orders' %}" {% if n == 'orders' or n == 'order_detail' %}aria-current="page"{% endif %}>Orders</a>
+  <a href="{% url 'dashboard:customers' %}" {% if n == 'customers' %}aria-current="page"{% endif %}>Customers</a>
+  <a href="{% url 'dashboard:enquiries' %}" {% if n == 'enquiries' %}aria-current="page"{% endif %}>Enquiries</a>
+  <a href="{% url 'admin:store_product_changelist' %}">Products</a>
+  <a href="{% url 'admin:store_review_changelist' %}">Reviews</a>
+  <a href="{% url 'admin:core_sitesetting_change' 1 %}">Shipping and GST</a>
+  <a href="{% url 'admin:index' %}">Full admin</a>
+  {% endwith %}
+</nav>

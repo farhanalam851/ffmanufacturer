@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Customers | Store dashboard{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block content %}
+<div class="container dash">{% include "dashboard/_nav.html" %}
+  <div><h1 style="font-size:2rem">Customers</h1>
+    <p><a href="?">All</a> · <a href="?type=business">Business</a> · <a href="?type=retail">Individuals</a> · <a href="?pending=1">Awaiting GSTIN verification</a></p>
+    <div class="table-wrap"><table class="data"><thead><tr><th>Customer</th><th>Business</th><th class="num">Orders</th><th class="num">Spent</th><th>Joined</th><th></th></tr></thead><tbody>
+      {% for u in page %}<tr><td><b>{{ u.get_full_name|default:u.email }}</b><br><span class="small muted">{{ u.email }} · {{ u.phone }}</span></td>
+        <td>{% if u.is_business %}{{ u.company_name }}<br><span class="small muted">{{ u.gstin }}</span> {% if u.business_verified %}<span class="badge ok">Verified</span>{% else %}<span class="badge">Pending</span>{% endif %}{% else %}<span class="muted">Individual</span>{% endif %}</td>
+        <td class="num">{{ u.order_count }}</td><td class="num">₹{{ u.spent|default:0|floatformat:0|intcomma }}</td><td>{{ u.date_joined|date:"j M Y" }}</td>
+        <td>{% if u.is_business %}<form method="post" action="{% url 'dashboard:verify_business' u.pk %}">{% csrf_token %}<input type="hidden" name="verify" value="{% if u.business_verified %}0{% else %}1{% endif %}"><input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="btn btn-sm {% if u.business_verified %}btn-ghost{% endif %}" type="submit">{% if u.business_verified %}Unverify{% else %}Verify GSTIN{% endif %}</button></form>{% endif %}</td></tr>
+      {% empty %}<tr><td colspan="6" class="muted">No customers match.</td></tr>{% endfor %}</tbody></table></div>
+    <nav class="pager">{% if page.has_previous %}<a class="btn btn-ghost btn-sm" href="?page={{ page.previous_page_number }}">Previous</a>{% endif %}<span class="muted">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>{% if page.has_next %}<a class="btn btn-ghost btn-sm" href="?page={{ page.next_page_number }}">Next</a>{% endif %}</nav>
+  </div>
+</div>
+{% endblock %}

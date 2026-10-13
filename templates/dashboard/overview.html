@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Store dashboard | F.F Manufacturer{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block content %}
+<div class="container dash">{% include "dashboard/_nav.html" %}
+  <div class="stack">
+    <h1 style="font-size:2rem;margin:0">Store dashboard</h1>
+    <div class="kpis">
+      <div class="kpi"><span class="v">₹{{ kpis.sales_30|floatformat:0|intcomma }}</span><span class="l">Sales, last 30 days</span></div>
+      <div class="kpi"><span class="v">₹{{ kpis.sales_month|floatformat:0|intcomma }}</span><span class="l">Sales this month</span></div>
+      <div class="kpi"><span class="v">₹{{ kpis.collected|floatformat:0|intcomma }}</span><span class="l">Payments received</span></div>
+      <div class="kpi {% if kpis.orders_open %}warn{% endif %}"><span class="v">{{ kpis.orders_open }}</span><span class="l">Orders to process</span></div>
+      <div class="kpi {% if kpis.to_verify %}warn{% endif %}"><span class="v">{{ kpis.to_verify }}</span><span class="l"><a href="{% url 'dashboard:customers' %}?pending=1">Businesses to verify</a></span></div>
+      <div class="kpi {% if kpis.new_enquiries %}warn{% endif %}"><span class="v">{{ kpis.new_enquiries }}</span><span class="l"><a href="{% url 'dashboard:enquiries' %}?status=new">New enquiries</a></span></div>
+      <div class="kpi"><span class="v">{{ kpis.customers }}</span><span class="l">Customers</span></div>
+      <div class="kpi"><span class="v">{{ kpis.reviews }}</span><span class="l">Reviews</span></div>
+    </div>
+    <div class="card"><h2 style="font-size:1.2rem">Sales, last 14 days</h2>
+      <div class="bars" role="img" aria-label="Daily sales for the last 14 days">{% for d in chart %}<div title="{{ d.label }}: ₹{{ d.value|floatformat:0|intcomma }}"><i style="height:{{ d.pct }}%"></i><span>{{ d.label|slice:":2" }}</span></div>{% endfor %}</div></div>
+    <div class="two-col">
+      <div class="card"><h2 style="font-size:1.2rem">Orders by status</h2>
+        {% for k, v in by_status.items %}<div class="summary" style="position:static"><div class="row"><a href="{% url 'dashboard:orders' %}?status={{ k }}"><span class="pill {{ k }}">{{ k|title }}</span></a><b>{{ v }}</b></div></div>{% endfor %}</div>
+      <div class="card"><h2 style="font-size:1.2rem">Best sellers</h2>
+        {% for t in top %}<div class="summary" style="position:static"><div class="row"><span>{{ t.product__name }}</span><b>{{ t.units }} pcs</b></div></div>{% empty %}<p class="muted">No sales yet.</p>{% endfor %}</div>
+    </div>
+    <div class="section-head" style="margin-bottom:0"><h2 style="font-size:1.3rem;margin:0">Recent orders</h2><a href="{% url 'dashboard:orders' %}">All orders</a></div>
+    <div class="table-wrap"><table class="data"><thead><tr><th>Order</th><th>Customer</th><th class="num">Total</th><th>Payment</th><th>Status</th></tr></thead><tbody>
+      {% for o in recent %}<tr><td><a href="{% url 'dashboard:order_detail' o.order_number %}"><b>{{ o.order_number }}</b></a><br><span class="small muted">{{ o.created|naturaltime }}</span></td><td>{{ o.ship_name }}{% if o.company_name %}<br><span class="small muted">{{ o.company_name }}</span>{% endif %}</td><td class="num">₹{{ o.total|intcomma }}</td><td><span class="pill {{ o.payment_status }}">{{ o.get_payment_status_display }}</span></td><td><span class="pill {{ o.status }}">{{ o.get_status_display }}</span></td></tr>
+      {% empty %}<tr><td colspan="5" class="muted">No orders yet.</td></tr>{% endfor %}</tbody></table></div>
+    <div class="card"><h2 style="font-size:1.2rem">Low stock (10 or fewer)</h2>
+      {% for p in low_stock %}<div class="summary" style="position:static"><div class="row"><a href="{% url 'admin:store_product_change' p.pk %}">{{ p.name }}</a><b>{{ p.stock }} left</b></div></div>{% empty %}<p class="muted">All belts are well stocked.</p>{% endfor %}</div>
+  </div>
+</div>
+{% endblock %}

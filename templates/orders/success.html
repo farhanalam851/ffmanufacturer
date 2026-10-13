@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Order placed | F.F Manufacturer{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block description %}Your F.F Manufacturer order has been placed.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block content %}
+<div class="container form-narrow section">
+  <div class="card stitch center">
+    <h1>{% if order.payment_status == "paid" %}Payment received{% else %}Order placed{% endif %}</h1>
+    <p>Thank you. Your order number is <b>{{ order.order_number }}</b> for ₹{{ order.total|intcomma }}.</p>
+    {% if order.payment_method == "bank" and order.payment_status != "paid" %}
+      <div class="notice" style="text-align:left"><b>Complete your payment</b><p style="margin:.4rem 0 0;white-space:pre-line">{{ setting.bank_details|default:"Call us on the number below for bank or UPI details." }}</p><p class="small" style="margin:.5rem 0 0">Use {{ order.order_number }} as the payment reference. We dispatch once it reaches us.</p></div>
+    {% elif order.payment_method == "cod" %}<p>Pay ₹{{ order.total|intcomma }} in cash when the courier delivers.</p>{% endif %}
+    <p class="muted small">A confirmation has been emailed to {{ order.user.email }}.</p>
+    <div style="display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap"><a class="btn" href="{% url 'orders:detail' order.order_number %}">View order</a><a class="btn btn-ghost" href="{% url 'orders:invoice' order.order_number %}">GST invoice</a></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | F.F Manufacturer{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block description %}{{ title }} - F.F Manufacturer account.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block content %}<div class="container empty"><h1>{{ title }}</h1><p class="muted">{{ body }}</p>{% if link %}<a class="btn" href="{% url link %}">{{ link_text }}</a>{% endif %}</div>{% endblock %}

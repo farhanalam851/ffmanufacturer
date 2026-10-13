@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Enquiries | Store dashboard{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block content %}
+<div class="container dash">{% include "dashboard/_nav.html" %}
+  <div><h1 style="font-size:2rem">Enquiries</h1>
+    <p>{% for k, v in statuses %}<a href="?status={{ k }}" class="pill {{ k }}" style="text-decoration:none;margin-right:.3rem">{{ v }}</a>{% endfor %} <a href="?">All</a></p>
+    {% for e in enquiries %}<div class="card" style="margin-bottom:1rem"><div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap"><div><b>{{ e.name }}</b>{% if e.company %} · {{ e.company }}{% endif %} <span class="pill {{ e.status }}">{{ e.get_status_display }}</span><br>
+      <a href="tel:+91{{ e.phone }}">{{ e.phone }}</a> · <a href="mailto:{{ e.email }}">{{ e.email }}</a>{% if e.gstin %} · GSTIN {{ e.gstin }}{% endif %}</div><span class="muted small">{{ e.created|date:"j M Y, g:i a" }} · {{ e.get_kind_display }}</span></div>
+      {% if e.product_interest or e.quantity %}<p class="small" style="margin:.6rem 0 0"><b>{{ e.product_interest }}</b>{% if e.quantity %} · {{ e.quantity }} pieces{% endif %}</p>{% endif %}
+      <p style="margin:.5rem 0">{{ e.message|linebreaksbr }}</p>
+      <form method="post" style="display:flex;gap:.5rem;align-items:center">{% csrf_token %}<input type="hidden" name="id" value="{{ e.pk }}"><select name="status" style="width:auto">{% for k, v in statuses %}<option value="{{ k }}" {% if k == e.status %}selected{% endif %}>{{ v }}</option>{% endfor %}</select><button class="btn btn-dark btn-sm" type="submit">Update</button></form></div>
+    {% empty %}<div class="card empty"><h3>No enquiries</h3></div>{% endfor %}
+  </div>
+</div>
+{% endblock %}

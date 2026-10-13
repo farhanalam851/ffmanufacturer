@@ -1,0 +1,9 @@
+{% load humanize %}
+<div class="table-wrap"><table class="data">
+  <thead><tr><th>Order</th><th>Date</th><th>Items</th><th class="num">Total</th><th>Payment</th><th>Status</th><th></th></tr></thead>
+  <tbody>{% for o in orders %}<tr>
+    <td><a href="{% url 'orders:detail' o.order_number %}"><b>{{ o.order_number }}</b></a></td><td>{{ o.created|date:"j M Y" }}</td>
+    <td>{% for i in o.items.all|slice:":2" %}{{ i.quantity }} × {{ i.name }}{% if not forloop.last %}<br>{% endif %}{% endfor %}{% if o.items.all|length > 2 %}<br><span class="muted small">+ {{ o.items.all|length|add:"-2" }} more</span>{% endif %}</td>
+    <td class="num">₹{{ o.total|intcomma }}</td><td><span class="pill {{ o.payment_status }}">{{ o.get_payment_status_display }}</span></td><td><span class="pill {{ o.status }}">{{ o.get_status_display }}</span></td>
+    <td><a href="{% url 'orders:detail' o.order_number %}">View</a></td></tr>{% endfor %}</tbody>
+</table></div>

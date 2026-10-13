@@ -1,0 +1,8 @@
+{% load humanize %}
+<dl>
+  <div class="row"><dt>Subtotal (incl. GST)</dt><dd style="margin:0" id="q-subtotal">₹{{ totals.subtotal|intcomma }}</dd></div>
+  <div class="row"><dt>Shipping</dt><dd style="margin:0" id="q-shipping">{% if totals.shipping %}₹{{ totals.shipping|intcomma }}{% else %}Free{% endif %}</dd></div>
+  <div class="row" id="q-cod-row" {% if not totals.cod_fee %}hidden{% endif %}><dt>Cash on delivery fee</dt><dd style="margin:0" id="q-cod">₹{{ totals.cod_fee|intcomma }}</dd></div>
+  <div class="row total"><dt>Total</dt><dd style="margin:0" id="q-total">₹{{ totals.total|intcomma }}</dd></div>
+  <div class="row small muted"><dt>Includes <span id="q-taxlabel">{% if totals.intra_state %}CGST + SGST{% else %}IGST{% endif %}</span></dt><dd style="margin:0" id="q-tax">₹{{ totals.tax|intcomma }}</dd></div>
+</dl>

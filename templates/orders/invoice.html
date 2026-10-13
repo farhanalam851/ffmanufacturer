@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Invoice {{ order.order_number }}{% endblock %}
+{% block content %}
+<div class="container section" style="max-width:900px">
+  <div class="no-print" style="display:flex;justify-content:space-between;margin-bottom:1rem"><a href="{% url 'orders:detail' order.order_number %}">Back to order</a><button class="btn btn-sm" data-print>Print or save as PDF</button></div>
+  <div class="card" style="background:#fff">
+    <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:1rem">
+      <div><h1 style="font-size:1.6rem;margin:0">{{ setting.company_name }}</h1><div class="small">{{ setting.address }}<br>Phone {{ setting.phone_primary }}{% if setting.gstin %}<br><b>GSTIN {{ setting.gstin }}</b>{% endif %}<br>State: {{ setting.seller_state }}</div></div>
+      <div class="right"><h2 style="margin:0">{% if order.gstin %}Tax invoice{% else %}Invoice{% endif %}</h2><div class="small">No. {{ order.order_number }}<br>Date {{ order.created|date:"j M Y" }}<br>Payment: {{ order.get_payment_method_display }} ({{ order.get_payment_status_display }})</div></div>
+    </div>
+    <div class="two-col" style="margin:1rem 0"><div class="small"><b>Billed to</b><br>{% if order.company_name %}{{ order.company_name }}<br>{% endif %}{{ order.ship_name }}<br>{% if order.gstin %}GSTIN {{ order.gstin }}<br>{% endif %}Phone {{ order.ship_phone }}</div>
+      <div class="small"><b>Ship to / place of supply</b><br>{{ order.ship_line1 }}{% if order.ship_line2 %}, {{ order.ship_line2 }}{% endif %}<br>{{ order.ship_city }}, {{ order.ship_state }} {{ order.ship_pincode }}</div></div>
+    <div class="table-wrap"><table class="data"><thead><tr><th>#</th><th>Description</th><th>HSN</th><th class="num">Qty</th><th class="num">Taxable</th><th class="num">GST %</th><th class="num">GST</th><th class="num">Amount</th></tr></thead><tbody>
+      {% for i in order.items.all %}<tr><td>{{ forloop.counter }}</td><td>{{ i.name }}<br><span class="small muted">{{ i.sku }}{% if i.size %} · Size {{ i.size }}{% endif %}</span></td><td>{{ i.hsn_code }}</td><td class="num">{{ i.quantity }}</td><td class="num">₹{{ i.taxable_value|intcomma }}</td><td class="num">{{ i.gst_rate|floatformat:"-2" }}</td><td class="num">₹{{ i.tax_amount|intcomma }}</td><td class="num">₹{{ i.line_total|intcomma }}</td></tr>{% endfor %}
+      {% if order.shipping_charge or order.cod_fee %}<tr><td></td><td colspan="6">Shipping and handling (incl. GST)</td><td class="num">₹{{ order.handling_total|intcomma }}</td></tr>{% endif %}</tbody></table></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:1rem"><div style="min-width:280px" class="summary"><div class="row"><span>Taxable value</span><span>₹{{ order.taxable_value|intcomma }}</span></div>
+      {% if order.is_intra_state %}<div class="row"><span>CGST</span><span>₹{{ order.cgst|intcomma }}</span></div><div class="row"><span>SGST</span><span>₹{{ order.sgst|intcomma }}</span></div>{% else %}<div class="row"><span>IGST</span><span>₹{{ order.igst|intcomma }}</span></div>{% endif %}
+      <div class="row total"><span>Invoice total</span><span>₹{{ order.total|intcomma }}</span></div></div></div>
+    <p class="small muted" style="margin-top:1.5rem">Prices include GST. This is a computer-generated invoice. Goods once sold are subject to our returns policy.</p>
+  </div>
+</div>
+{% endblock %}

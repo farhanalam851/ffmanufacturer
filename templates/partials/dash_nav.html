@@ -1,0 +1,11 @@
+<nav class="dash-nav" aria-label="Account">
+  {% with n=request.resolver_match.url_name %}
+  <a href="{% url 'accounts:dashboard' %}" {% if n == 'dashboard' %}aria-current="page"{% endif %}>Overview</a>
+  <a href="{% url 'orders:list' %}" {% if n == 'list' or n == 'detail' %}aria-current="page"{% endif %}>My orders</a>
+  <a href="{% url 'store:wishlist' %}">Wishlist</a>
+  <a href="{% url 'accounts:profile' %}" {% if n == 'profile' %}aria-current="page"{% endif %}>Profile</a>
+  <a href="{% url 'accounts:addresses' %}" {% if n == 'addresses' %}aria-current="page"{% endif %}>Addresses</a>
+  <a href="{% url 'accounts:password_change' %}">Password</a>
+  {% if user.is_staff %}<a href="{% url 'dashboard:overview' %}">Store dashboard</a>{% endif %}
+  {% endwith %}
+</nav>

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | F.F Manufacturer{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block description %}{{ title }} for your F.F Manufacturer account.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block content %}
+<div class="container form-narrow section">
+  <h1>{{ title }}</h1>
+  {% if form %}
+  <form method="post" class="card stitch" novalidate>{% csrf_token %}
+    {% include "partials/form_fields.html" %}
+    <div style="display:flex;gap:.7rem;flex-wrap:wrap"><button class="btn" type="submit">{{ submit|default:"Save" }}</button>{% if back %}<a class="btn btn-ghost" href="{% url back %}">Cancel</a>{% endif %}</div>
+  </form>
+  {% else %}
+  <div class="card"><p>This link is no longer valid. It may have expired or already been used.</p><a class="btn" href="{% url 'accounts:password_reset' %}">Request a new link</a></div>
+  {% endif %}
+</div>
+{% endblock %}

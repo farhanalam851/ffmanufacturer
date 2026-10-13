@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Track your order | F.F Manufacturer{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block description %}Track your F.F Manufacturer leather belt order with your order number.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block content %}
+<div class="container form-narrow section">
+  <h1>Track your order</h1>
+  <form method="post" class="card" novalidate>{% csrf_token %}
+    <div class="field"><label for="on">Order number</label><input id="on" name="order_number" value="{{ request.POST.order_number }}" placeholder="FF260900012" autocapitalize="characters" required></div>
+    <div class="field"><label for="ph">Phone used on the order</label><input id="ph" name="phone" type="tel" inputmode="numeric" value="{{ request.POST.phone }}" required></div>
+    <button class="btn" type="submit">Check status</button></form>
+  {% if order %}<div class="card" style="margin-top:1.5rem"><h2 style="font-size:1.3rem">{{ order.order_number }} · {{ order.get_status_display }}</h2>
+    {% if order.status != "cancelled" %}<ol class="timeline">{% for label, done in order.timeline %}<li class="{% if done %}done{% endif %}">{{ label }}</li>{% endfor %}</ol>{% endif %}
+    {% if order.tracking_number %}<p style="margin-top:1rem">Courier: {{ order.courier|default:"-" }}<br>Tracking number: <b>{{ order.tracking_number }}</b></p>{% endif %}</div>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% load humanize %}
+<article class="pcard">
+  <div class="badges">
+    {% if not p.in_stock %}<span class="badge out">Sold out</span>{% elif p.discount_percent %}<span class="badge">{{ p.discount_percent }}% off</span>{% endif %}
+  </div>
+  {% if user.is_authenticated %}
+  <form class="wish" method="post" action="{% url 'store:wishlist_toggle' p.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button type="submit" class="{% if p.pk in wished %}on{% endif %}" aria-label="{% if p.pk in wished %}Remove from{% else %}Save to{% endif %} wishlist"><svg viewBox="0 0 24 24" fill="{% if p.pk in wished %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.4-9.5 9-9.5 9z"/></svg></button></form>
+  {% endif %}
+  <div class="ph"><img src="{{ p.image.url }}" alt="{{ p.name }}" width="600" height="600" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <span class="cat">{{ p.category.name }}</span>
+    <h3><a href="{{ p.get_absolute_url }}">{{ p.name }}</a></h3>
+    <div class="rating-line">{% if p.review_count %}{% include "partials/stars.html" with value=p.avg_rating %} ({{ p.review_count }}){% endif %}</div>
+    <div class="price">₹{{ p.retail_price|intcomma }}{% if p.discount_percent %}<span class="mrp">₹{{ p.price|intcomma }}</span>{% endif %}</div>
+  </div>
+</article>

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | F.F Manufacturer{% endblock %}
+{% block description %}{{ title }} for F.F Manufacturer, premium leather belts from Kanpur: shipping, GST, returns, terms and privacy information.{% endblock %}
+{% block content %}
+<div class="container page-head"><h1>{{ title }}</h1></div>
+<div class="container prose" style="padding-bottom:3rem">
+{% if slug == "shipping-policy" %}
+<p>We dispatch from {{ SITE.address }}. Most in-stock orders leave within 2 working days of payment confirmation (or order confirmation for cash on delivery). Delivery time depends on your location and courier.</p>
+<h2>Shipping charges</h2>
+<ul><li>Orders of ₹{{ SITE.free_shipping_threshold|floatformat:0 }} or more ship free. Verified business accounts ship free from ₹{{ SITE.b2b_free_shipping_threshold|floatformat:0 }}.</li>
+<li>Below that, shipping is ₹{{ SITE.flat_shipping_charge|floatformat:0 }}{% if SITE.outstation_surcharge %}, plus ₹{{ SITE.outstation_surcharge|floatformat:0 }} for delivery outside {{ SITE.seller_state }}{% endif %}.</li>
+<li>Cash on delivery carries a ₹{{ SITE.cod_fee|floatformat:0 }} handling fee and is available for orders up to ₹{{ SITE.cod_max_amount|floatformat:0 }}.</li></ul>
+<h2>GST</h2><p>All prices include GST. Your invoice shows the taxable value and GST split: CGST and SGST for deliveries within {{ SITE.seller_state }}, IGST for other states.</p>
+{% elif slug == "returns" %}
+<p>If your belt arrives damaged or is not what you ordered, contact us within 7 days of delivery with your order number and photos. We will arrange a replacement or refund.</p>
+<ul><li>Unused belts in original condition can be exchanged for a different size within 7 days of delivery.</li><li>Custom or bulk orders made to your specification cannot be returned unless faulty.</li><li>Refunds go back to the original payment method within 5 to 7 working days of approval.</li></ul>
+{% elif slug == "terms" %}
+<p>By placing an order you agree to these terms. Prices are in Indian rupees and include GST. We may cancel an order if an item is out of stock or a price was listed in error, and we will refund any payment in that case.</p>
+<ul><li>Wholesale tier prices apply only to business accounts whose GSTIN we have verified.</li><li>Product colours may differ slightly from photos because leather is a natural material.</li><li>Disputes are subject to the courts of Kanpur, Uttar Pradesh.</li></ul>
+{% else %}
+<p>We collect your name, contact details, address and, for business accounts, GSTIN so we can process and ship your orders and issue invoices. Online payments are handled by Razorpay; we never see or store your card details.</p>
+<ul><li>We do not sell your data.</li><li>We share delivery details with courier partners only to deliver your order.</li><li>To see or delete your data, call or email us using the details on the Contact page.</li></ul>
+<h2>Cookies and analytics</h2>
+<p>We use essential cookies to keep you logged in, remember your cart and protect forms from forgery. These cannot be switched off. If analytics is enabled on this site, we also use Google Analytics cookies to count visits and see which pages are useful, but only if you click "Accept analytics" on the cookie banner. You can change your choice any time with the "Cookie settings" link in the footer.</p>
+<h2>How long we keep data</h2>
+<p>We keep order and invoice records for as long as tax law requires. Enquiries are kept until we have responded and for a reasonable period after.</p>
+<h2>Contact</h2>
+<p>Questions about privacy: {{ SITE.email }} or {{ SITE.phone_primary }}.</p>
+{% endif %}
+<p class="small muted">Draft policy text. Have it reviewed before launch.</p>
+</div>
+{% endblock %}

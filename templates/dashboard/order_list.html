@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Orders | Store dashboard{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block content %}
+<div class="container dash">{% include "dashboard/_nav.html" %}
+  <div><h1 style="font-size:2rem">Orders</h1>
+    <form method="get" class="form-grid" style="margin-bottom:1rem;grid-template-columns:2fr 1fr 1fr auto;align-items:end">
+      <div class="field" style="margin:0"><label for="q">Search</label><input id="q" type="search" name="q" value="{{ q }}" placeholder="Order no, name, phone, GSTIN"></div>
+      <div class="field" style="margin:0"><label for="s">Status</label><select id="s" name="status"><option value="">All</option>{% for k, v in statuses %}<option value="{{ k }}" {% if k == status %}selected{% endif %}>{{ v }}</option>{% endfor %}</select></div>
+      <div class="field" style="margin:0"><label for="p">Payment</label><select id="p" name="payment"><option value="">All</option>{% for k, v in pay_statuses %}<option value="{{ k }}" {% if k == payment %}selected{% endif %}>{{ v }}</option>{% endfor %}</select></div>
+      <button class="btn btn-dark" type="submit">Filter</button></form>
+    <div class="table-wrap"><table class="data"><thead><tr><th>Order</th><th>Customer</th><th>State</th><th class="num">Total</th><th>Payment</th><th>Status</th></tr></thead><tbody>
+      {% for o in page %}<tr><td><a href="{% url 'dashboard:order_detail' o.order_number %}"><b>{{ o.order_number }}</b></a><br><span class="small muted">{{ o.created|date:"j M, g:i a" }}</span></td><td>{{ o.ship_name }}<br><span class="small muted">{{ o.ship_phone }}</span></td><td>{{ o.ship_state }}</td><td class="num">₹{{ o.total|intcomma }}</td><td><span class="pill {{ o.payment_status }}">{{ o.get_payment_status_display }}</span><br><span class="small muted">{{ o.get_payment_method_display }}</span></td><td><span class="pill {{ o.status }}">{{ o.get_status_display }}</span></td></tr>
+      {% empty %}<tr><td colspan="6" class="muted">No orders match.</td></tr>{% endfor %}</tbody></table></div>
+    <nav class="pager">{% if page.has_previous %}<a class="btn btn-ghost btn-sm" href="?q={{ q }}&status={{ status }}&payment={{ payment }}&page={{ page.previous_page_number }}">Previous</a>{% endif %}<span class="muted">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>{% if page.has_next %}<a class="btn btn-ghost btn-sm" href="?q={{ q }}&status={{ status }}&payment={{ payment }}&page={{ page.next_page_number }}">Next</a>{% endif %}</nav>
+  </div>
+</div>
+{% endblock %}

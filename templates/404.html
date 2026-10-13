@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Page not found | F.F Manufacturer{% endblock %}
+{% block description %}The page you were looking for could not be found at F.F Manufacturer.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block content %}
+<div class="container empty">
+  <p class="code404" aria-hidden="true">404</p>
+  <h1>That page isn't here</h1>
+  <p class="muted">The link may be old, or the belt may have sold out and been removed. Try a search or head back to the shop.</p>
+  <form class="nf-search" action="{% url 'store:catalog' %}" role="search"><input type="search" name="q" placeholder="Search belts" aria-label="Search belts"><button class="btn" type="submit">Search</button></form>
+  <div class="nf-links"><a class="btn" href="{% url 'store:catalog' %}">Browse belts</a><a class="btn btn-ghost" href="{% url 'core:home' %}">Home</a><a class="btn btn-ghost" href="{% url 'core:contact' %}">Contact us</a></div>
+</div>
+{% endblock %}

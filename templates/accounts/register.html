@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Create account | F.F Manufacturer{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block description %}Create a retail or business account at F.F Manufacturer to order leather belts and unlock wholesale tier pricing.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block content %}
+<div class="container form-narrow section">
+  <h1>Create your account</h1>
+  <form method="post" class="card stitch" novalidate>{% csrf_token %}
+    {% include "partials/form_fields.html" %}
+    <button class="btn btn-block" type="submit">Create account</button>
+    <p class="small muted" style="margin:1rem 0 0">Business accounts get wholesale tier prices after we verify the GSTIN.</p>
+  </form>
+  <p style="margin-top:1.2rem">Already registered? <a href="{% url 'accounts:login' %}">Log in</a></p>
+</div>
+<script nonce="{{ csp_nonce }}">
+(function () {
+  var radios = document.querySelectorAll('input[name=account_type]');
+  var biz = document.querySelectorAll('[data-field=company_name],[data-field=gstin]');
+  function sync() { var v = (document.querySelector('input[name=account_type]:checked') || {}).value; biz.forEach(function (b) { b.hidden = v !== 'business'; }); }
+  radios.forEach(function (r) { r.addEventListener('change', sync); }); sync();
+})();
+</script>
+{% endblock %}

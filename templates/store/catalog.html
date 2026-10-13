@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{% if category %}{{ category.name }}{% elif q %}Search: {{ q }}{% else %}Shop leather belts{% endif %} | F.F Manufacturer{% endblock %}
+{% block description %}{% if category %}Shop {{ category.name }} leather belts{% else %}Shop premium leather belts for men and women{% endif %} from F.F Manufacturer, Kanpur. GST invoice, wholesale pricing and pan-India shipping.{% endblock %}
+{% block robots %}{% if q %}<meta name="robots" content="noindex,follow">{% endif %}{% endblock %}
+{% block head %}<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"{{ request.scheme }}://{{ request.get_host }}/"},{"@type":"ListItem","position":2,"name":"Shop","item":"{{ request.scheme }}://{{ request.get_host }}{% url 'store:catalog' %}"}{% if category %},{"@type":"ListItem","position":3,"name":"{{ category.name|escapejs }}"}{% endif %}]}</script>{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="{% url 'core:home' %}">Home</a> / {% if category %}<a href="{% url 'store:catalog' %}">Shop</a> / {{ category.name }}{% else %}Shop{% endif %}</nav>
+  <h1>{% if category %}{{ category.name }}{% elif q %}Results for “{{ q }}”{% else %}All leather belts{% endif %}</h1>
+  {% if category.description %}<p class="muted">{{ category.description }}</p>{% endif %}
+</div>
+<div class="container catalog-layout">
+  <aside class="filters" id="filters" aria-label="Filters">
+    <form method="get" action="{% if category %}{% url 'store:category' category.slug %}{% else %}{% url 'store:catalog' %}{% endif %}">
+      <h3>Search</h3><input type="search" name="q" value="{{ q }}" placeholder="Name, colour or SKU">
+      <h3>For</h3>
+      <select name="gender"><option value="">Everyone</option><option value="men" {% if gender == "men" %}selected{% endif %}>Men</option><option value="women" {% if gender == "women" %}selected{% endif %}>Women</option></select>
+      <h3>Price (₹)</h3>
+      <div style="display:flex;gap:.5rem"><input type="number" name="min" min="0" placeholder="Min" value="{{ request.GET.min }}"><input type="number" name="max" min="0" placeholder="Max" value="{{ request.GET.max }}"></div>
+      <label style="display:flex;gap:.5rem;margin-top:.8rem;align-items:center"><input type="checkbox" name="in_stock" value="1" {% if request.GET.in_stock %}checked{% endif %}> In stock only</label>
+      <input type="hidden" name="sort" value="{{ sort }}">
+      <button class="btn btn-dark btn-block" style="margin-top:1rem" type="submit">Apply filters</button>
+    </form>
+    <h3>Styles</h3>
+    <ul><li><a href="{% url 'store:catalog' %}" {% if not category %}class="on"{% endif %}>All belts</a></li>
+    {% for c in categories %}<li><a href="{{ c.get_absolute_url }}" {% if category and category.pk == c.pk %}class="on"{% endif %}>{{ c.name }} <span>{{ c.n }}</span></a></li>{% endfor %}</ul>
+  </aside>
+  <section>
+    <div class="toolbar">
+      <span class="muted">{{ total }} belt{{ total|pluralize }}</span>
+      <button class="btn btn-ghost btn-sm filter-toggle" type="button" aria-expanded="false" aria-controls="filters">Filters</button>
+      <form method="get">{% for k, v in request.GET.items %}{% if k != "sort" and k != "page" %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endif %}{% endfor %}
+        <label class="sr-only" for="sort">Sort by</label>
+        <select id="sort" name="sort" onchange="this.form.submit()">{% for k, label in sorts %}<option value="{{ k }}" {% if k == sort %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></form>
+    </div>
+    {% if page.object_list %}
+    <div class="grid-products" style="grid-template-columns:repeat(auto-fill,minmax(210px,1fr))">{% for p in page %}{% include "partials/product_card.html" %}{% endfor %}</div>
+    <nav class="pager" aria-label="Pages">
+      {% if page.has_previous %}<a class="btn btn-ghost btn-sm" href="?{{ querystring }}&page={{ page.previous_page_number }}">Previous</a>{% endif %}
+      <span class="muted">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+      {% if page.has_next %}<a class="btn btn-ghost btn-sm" href="?{{ querystring }}&page={{ page.next_page_number }}">Next</a>{% endif %}
+    </nav>
+    {% else %}
+    <div class="empty"><h2>No belts match those filters</h2><p class="muted">Clear a filter or search for a different colour.</p><a class="btn" href="{% url 'store:catalog' %}">Show all belts</a></div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

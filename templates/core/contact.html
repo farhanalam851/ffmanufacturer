@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Contact | F.F Manufacturer{% endblock %}
+{% block description %}Contact F.F Manufacturer in Jajmau, Kanpur. Call, WhatsApp or send a message about leather belts, orders or wholesale.{% endblock %}
+{% block content %}
+<div class="container page-head"><h1>Contact us</h1></div>
+<div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;padding-bottom:3rem" id="contact-grid">
+  <form method="post" class="card" novalidate>{% csrf_token %}{% include "partials/form_fields.html" %}<button class="btn" type="submit">Send message</button></form>
+  <div class="prose"><h2 style="margin-top:0">Reach us directly</h2>
+    <p>{{ SITE.address }}</p>
+    <p>Call: <a href="tel:+91{{ SITE.phone_primary }}">{{ SITE.phone_primary }}</a>{% if SITE.phone_secondary %} or <a href="tel:+91{{ SITE.phone_secondary }}">{{ SITE.phone_secondary }}</a>{% endif %}<br>
+    WhatsApp: <a href="https://wa.me/{{ SITE.whatsapp_number }}" rel="noopener">message us</a><br>Email: <a href="mailto:{{ SITE.email }}">{{ SITE.email }}</a></p>
+    <p class="muted">Buying 12 or more belts? Use the <a href="{% url 'core:bulk_enquiry' %}">wholesale enquiry form</a> instead.</p></div>
+</div>
+<style>@media(max-width:820px){#contact-grid{grid-template-columns:1fr!important}}</style>
+{% endblock %}

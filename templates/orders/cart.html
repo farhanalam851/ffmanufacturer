@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Your cart | F.F Manufacturer{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block description %}Review the leather belts in your cart at F.F Manufacturer.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block content %}
+<div class="container page-head"><h1>Your cart</h1></div>
+{% if lines %}
+<div class="container cart-layout">
+  <form method="post" action="{% url 'orders:cart_update' %}" id="cart-form">{% csrf_token %}
+    {% for l in lines %}
+    <div class="line">
+      <a href="{{ l.product.get_absolute_url }}"><img src="{{ l.product.image.url }}" alt="{{ l.product.name }}"></a>
+      <div><h3><a href="{{ l.product.get_absolute_url }}">{{ l.product.name }}</a></h3>
+        <div class="small muted">Size {{ l.size }} · ₹{{ l.unit_price|intcomma }} each{% if l.tier_applied %} <span class="badge ok">Wholesale price</span>{% endif %}</div>
+        <div style="margin-top:.5rem;display:flex;gap:1rem;align-items:center">
+          <div class="qty"><button type="button" data-step="-" aria-label="Decrease">−</button><input type="number" name="qty_{{ l.key }}" value="{{ l.qty }}" min="0" max="{{ l.product.stock }}" aria-label="Quantity for {{ l.product.name }}"><button type="button" data-step="+" aria-label="Increase">+</button></div>
+          <button class="link-btn small" type="submit" form="rm-{{ forloop.counter }}">Remove</button></div></div>
+      <div class="lt"><b>₹{{ l.line_total|intcomma }}</b></div>
+    </div>{% endfor %}
+    <div style="margin-top:1rem;display:flex;gap:.7rem;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" type="submit">Update quantities</button><a class="btn btn-ghost btn-sm" href="{% url 'store:catalog' %}">Keep shopping</a></div>
+  </form>
+  {% for l in lines %}<form id="rm-{{ forloop.counter }}" method="post" action="{% url 'orders:cart_remove' %}">{% csrf_token %}<input type="hidden" name="key" value="{{ l.key }}"></form>{% endfor %}
+  <aside class="summary card stitch">
+    <h2 style="font-size:1.3rem">Order summary</h2>
+    {% if totals.to_free_shipping %}<div class="free-ship need">Add ₹{{ totals.to_free_shipping|intcomma }} more for free shipping.</div>{% else %}<div class="free-ship">Your order ships free.</div>{% endif %}
+    {% include "orders/_summary.html" %}
+    {% if user.is_authenticated %}<a class="btn btn-block" style="margin-top:1rem" href="{% url 'orders:checkout' %}">Checkout</a>
+    {% else %}<a class="btn btn-block" style="margin-top:1rem" href="{% url 'accounts:login' %}?next={% url 'orders:checkout' %}">Log in to checkout</a><p class="small muted" style="margin:.7rem 0 0">New? <a href="{% url 'accounts:register' %}?next={% url 'orders:checkout' %}">Create an account</a> in a minute.</p>{% endif %}
+    {% if not user.is_wholesale %}<p class="small muted" style="margin:.8rem 0 0">Buying in bulk? <a href="{% url 'core:bulk_enquiry' %}">Ask for wholesale prices</a>.</p>{% endif %}
+  </aside>
+</div>
+{% else %}
+<div class="container empty"><h2>Your cart is empty</h2><p class="muted">Find a belt you like and it will wait for you here.</p><a class="btn" href="{% url 'store:catalog' %}">Browse belts</a></div>
+{% endif %}
+{% endblock %}

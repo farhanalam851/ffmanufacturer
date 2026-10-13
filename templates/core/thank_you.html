@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Thank you | F.F Manufacturer{% endblock %}
+{% block description %}Thank you for contacting F.F Manufacturer. We will call you within one working day.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block content %}
+<div class="container form-narrow section">
+  <div class="card stitch center" id="thank-you">
+    <div class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+    <h1>Thank you, we have your {% if kind == "bulk" %}wholesale enquiry{% else %}message{% endif %}</h1>
+    <p>Our team will call you within one working day{% if kind == "bulk" %} with tier prices and availability{% endif %}. In a hurry? Call <a href="tel:+91{{ SITE.phone_primary }}">{{ SITE.phone_primary }}</a> or message us on WhatsApp.</p>
+    <div style="display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap">
+      <a class="btn" href="{% url 'store:catalog' %}">Browse belts</a>
+      <a class="btn btn-ghost" href="{% url 'core:home' %}">Back to home</a>
+    </div>
+  </div>
+</div>
+<script nonce="{{ csp_nonce }}">window.FF=window.FF||{};window.FF.conversion="{{ kind }}";</script>
+{% endblock %}

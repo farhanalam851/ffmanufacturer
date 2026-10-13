@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load humanize l10n %}
+{% block title %}{{ product.name }} | F.F Manufacturer{% endblock %}
+{% block description %}{{ product.short_description|default:product.name }}{% endblock %}
+{% block og_title %}{{ product.name }} | F.F Manufacturer{% endblock %}
+{% block og_description %}{{ product.short_description|default:product.name }}{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}{% endblock %}
+{% block sticky_cta %}<div class="sticky-cta no-print" role="region" aria-label="Buy this belt">
+  <div class="sc-price">₹{{ product.retail_price|intcomma }}<small>incl. GST</small></div>
+  {% if product.in_stock %}<button class="btn" type="submit" form="pdp-form">Add to cart</button>{% else %}<a class="btn" href="{% url 'core:bulk_enquiry' %}?product={{ product.name|urlencode }}">Ask for restock</a>{% endif %}
+</div>{% endblock %}
+{% block head %}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"{{ request.scheme }}://{{ request.get_host }}/"},{"@type":"ListItem","position":2,"name":"Shop","item":"{{ request.scheme }}://{{ request.get_host }}{% url 'store:catalog' %}"},{"@type":"ListItem","position":3,"name":"{{ product.category.name|escapejs }}","item":"{{ request.scheme }}://{{ request.get_host }}{{ product.category.get_absolute_url }}"},{"@type":"ListItem","position":4,"name":"{{ product.name|escapejs }}"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"{{ product.name|escapejs }}","sku":"{{ product.sku }}","image":"{{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}","description":"{{ product.short_description|escapejs }}","brand":{"@type":"Brand","name":"F.F Manufacturer"},"offers":{"@type":"Offer","priceCurrency":"INR","price":"{{ product.retail_price|unlocalize }}","availability":"https://schema.org/{% if product.in_stock %}InStock{% else %}OutOfStock{% endif %}"}{% if product.review_count %},"aggregateRating":{"@type":"AggregateRating","ratingValue":"{{ product.avg_rating|floatformat:1|unlocalize }}","reviewCount":"{{ product.review_count }}"}{% endif %}}</script>
+{% endblock %}
+{% block content %}
+<div class="container page-head"><nav class="crumbs" aria-label="Breadcrumb"><a href="{% url 'core:home' %}">Home</a> / <a href="{% url 'store:catalog' %}">Shop</a> / <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a> / {{ product.name }}</nav></div>
+<div class="container pdp">
+  <div class="gallery">
+    <div class="main stitch"><img id="gallery-main" src="{{ product.image.url }}" alt="{{ product.name }}" width="800" height="800" fetchpriority="high"></div>
+    {% if images|length > 1 %}<div class="thumbs">{% for img in images %}<button type="button" data-src="{{ img.url }}" {% if forloop.first %}aria-current="true"{% endif %} aria-label="View photo {{ forloop.counter }}"><img src="{{ img.url }}" alt="{{ product.name }}, photo {{ forloop.counter }}"></button>{% endfor %}</div>{% endif %}
+  </div>
+  <div>
+    <h1>{{ product.name }}</h1>
+    <div class="rating-line">{% if product.review_count %}{% include "partials/stars.html" with value=product.avg_rating %} <a href="#reviews">{{ product.avg_rating|floatformat:1 }} · {{ product.review_count }} review{{ product.review_count|pluralize }}</a>{% else %}<a href="#reviews">Be the first to review</a>{% endif %}</div>
+    <div class="price">₹{{ product.retail_price|intcomma }}{% if product.discount_percent %}<span class="mrp">₹{{ product.price|intcomma }}</span><span class="off">{{ product.discount_percent }}% off</span>{% endif %}</div>
+    <div class="gst-note">Inclusive of {{ product.gst_rate|floatformat:"-2" }}% GST. Shipping calculated at checkout.</div>
+    <p style="margin-top:1rem">{{ product.short_description }}</p>
+
+    {% if product.tiers.all %}
+    <div class="tier-box">
+      <h4>Wholesale prices per piece</h4>
+      <table><thead><tr><th>Quantity</th><th>Price (incl. GST)</th></tr></thead><tbody>
+        <tr data-min="1"><td>1 or more</td><td>₹{{ product.retail_price|intcomma }}</td></tr>
+        {% for t in product.tiers.all %}<tr data-min="{{ t.min_qty }}"><td>{{ t.min_qty }}+ pieces</td><td>{% if user.is_wholesale %}₹{{ t.price|intcomma }}{% else %}<span class="muted">Business accounts only</span>{% endif %}</td></tr>{% endfor %}
+      </tbody></table>
+      <p class="small" style="margin:.7rem 0 0">
+      {% if user.is_wholesale %}Your verified business pricing applies automatically in the cart.
+      {% elif user.is_authenticated and user.is_business %}Your GSTIN is awaiting verification. Tier prices unlock once it is approved.
+      {% else %}<a href="{% url 'accounts:register' %}?type=business">Register a business account</a> to unlock these prices, or <a href="{% url 'core:bulk_enquiry' %}?product={{ product.name|urlencode }}">send a bulk enquiry</a>.{% endif %}</p>
+    </div>
+    {% endif %}
+
+    {% if product.in_stock %}
+    <form method="post" id="pdp-form" action="{% url 'orders:cart_add' product.pk %}">{% csrf_token %}
+      <div class="field"><span class="lbl">{% if product.sizes %}Waist size (inches){% else %}Size{% endif %}</span>
+        <div class="size-chips" role="radiogroup">{% for s in sizes %}<label><input type="radio" name="size" value="{{ s }}" {% if forloop.first %}checked{% endif %} required><span>{{ s }}</span></label>{% endfor %}</div>
+        {% if product.sizes %}<div class="help">Measure the belt you wear now from the buckle's fold to the hole you use, or your waist plus 2 inches.</div>{% endif %}</div>
+      <div class="buy-row">
+        <div class="qty"><button type="button" data-step="-" aria-label="Decrease">−</button><input id="pdp-qty" type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" aria-label="Quantity"><button type="button" data-step="+" aria-label="Increase">+</button></div>
+        <button class="btn" type="submit">Add to cart</button>
+        <button class="btn btn-dark" type="submit" name="buy_now" value="1">Buy now</button>
+      </div>
+    </form>
+    {% if product.stock <= 10 %}<span class="badge">Only {{ product.stock }} left</span>{% else %}<span class="badge ok">In stock</span>{% endif %}
+    {% else %}
+    <div class="notice"><b>Sold out.</b> Need this belt in bulk? <a href="{% url 'core:bulk_enquiry' %}?product={{ product.name|urlencode }}">Send a wholesale enquiry</a> for a restock date.</div>
+    {% endif %}
+    {% if user.is_authenticated %}<form method="post" action="{% url 'store:wishlist_toggle' product.pk %}" style="margin-top:1rem">{% csrf_token %}<button class="link-btn" type="submit">{% if in_wishlist %}Remove from wishlist{% else %}Save to wishlist{% endif %}</button></form>{% endif %}
+
+    <table class="spec" style="margin-top:1.5rem">
+      <tr><th>SKU</th><td>{{ product.sku }}</td></tr>
+      <tr><th>Material</th><td>{{ product.material }}</td></tr>
+      {% if product.color %}<tr><th>Colour</th><td>{{ product.color }}</td></tr>{% endif %}
+      {% if product.buckle %}<tr><th>Buckle</th><td>{{ product.buckle }}</td></tr>{% endif %}
+      <tr><th>HSN code</th><td>{{ product.hsn_code }}</td></tr>
+    </table>
+    {% if product.description %}<div style="margin-top:1.2rem">{{ product.description|linebreaks }}</div>{% endif %}
+  </div>
+</div>
+
+<section class="container section" id="reviews" style="padding-top:1rem">
+  <h2>Ratings and reviews</h2>
+  <div class="reviews">
+    <div class="card">
+      {% if product.review_count %}<div style="font:700 2.6rem var(--serif)">{{ product.avg_rating|floatformat:1 }}</div>{% include "partials/stars.html" with value=product.avg_rating %}<p class="small muted">{{ product.review_count }} review{{ product.review_count|pluralize }}</p>
+      {% for n, c in dist.items reversed %}<div class="bar-row"><span>{{ n }}★</span><span class="track"><span class="fill" style="width:{% widthratio c product.review_count 100 %}%"></span></span><span>{{ c }}</span></div>{% endfor %}
+      {% else %}<p class="muted">No reviews yet.</p>{% endif %}
+    </div>
+    <div>
+      {% if user.is_authenticated %}
+      <details class="card" style="margin-bottom:1.5rem" {% if existing %}{% else %}open{% endif %}><summary style="cursor:pointer;font-weight:700">{% if existing %}Edit your review{% else %}Write a review{% endif %}</summary>
+        <form method="post" action="{% url 'store:review_add' product.slug %}" enctype="multipart/form-data" style="margin-top:1rem">{% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="field"><span class="lbl" id="rate-lbl">Your rating</span>
+            <div class="rating-input" role="radiogroup" aria-labelledby="rate-lbl">{% for v in "54321" %}<input type="radio" id="rate{{ v }}" name="rating" value="{{ v }}" {% if form.rating.value|stringformat:"s" == v %}checked{% endif %} required><label for="rate{{ v }}" title="{{ v }} star{{ v|pluralize }}">{{ v }} star{{ v|pluralize }}</label>{% endfor %}</div></div>
+          {% for f in form %}{% if f.name != "rating" %}<div class="field"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endif %}{% endfor %}
+          <button class="btn" type="submit">Post review</button></form></details>
+      {% else %}<p><a href="{% url 'accounts:login' %}?next={{ request.path }}%23reviews">Log in</a> to rate this belt and add a photo.</p>{% endif %}
+      {% for r in reviews %}
+      <article class="review">{% include "partials/stars.html" with value=r.rating %} <b>{{ r.title }}</b>
+        <div class="small muted">{{ r.user.first_name|default:"Customer" }} · {{ r.created|date:"j M Y" }}{% if r.user_id in verified_ids %} · <span class="badge ok">Verified buyer</span>{% endif %}</div>
+        <p style="margin:.4rem 0 0">{{ r.comment }}</p>{% if r.photo %}<a href="{{ r.photo.url }}"><img class="rphoto" src="{{ r.photo.url }}" alt="Photo from {{ r.user.first_name }}'s review" loading="lazy"></a>{% endif %}</article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% if related %}<section class="container section" style="padding-top:0"><h2>More in {{ product.category.name }}</h2><div class="grid-products">{% for p in related %}{% include "partials/product_card.html" %}{% endfor %}</div></section>{% endif %}
+{% endblock %}

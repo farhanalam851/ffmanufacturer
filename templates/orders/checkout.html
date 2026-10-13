@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Checkout | F.F Manufacturer{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block description %}Secure checkout for your F.F Manufacturer order.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block content %}
+<div class="container page-head"><h1>Checkout</h1></div>
+<form method="post" id="checkout-form" data-quote="{% url 'orders:quote' %}" class="container checkout-layout" novalidate>{% csrf_token %}
+  <div>
+    {% if errors %}<div class="msg error" role="alert" style="margin-bottom:1rem">{% for e in errors %}{{ e }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
+    <h2 style="font-size:1.4rem">1. Delivery address</h2>
+    {% for a in addresses %}
+    <label class="opt"><input type="radio" name="address_id" value="{{ a.pk }}" data-state="{{ a.state }}" {% if selected_addr == a.pk|stringformat:"s" %}checked{% endif %}>
+      <span><b>{{ a.full_name }}</b> · {{ a.phone }}<br>{{ a.line1 }}{% if a.line2 %}, {{ a.line2 }}{% endif %}, {{ a.city }}, {{ a.state }} {{ a.pincode }}</span></label>{% endfor %}
+    <label class="opt"><input type="radio" name="address_id" value="new" {% if selected_addr == "new" %}checked{% endif %}><span><b>Deliver to a new address</b></span></label>
+    <div id="new-address" class="card" style="margin-bottom:1rem" {% if selected_addr != "new" %}hidden{% endif %}>{% include "partials/form_fields.html" with form=aform %}</div>
+
+    {% if user.is_business %}
+    <h2 style="font-size:1.4rem;margin-top:1.8rem">GST invoice details</h2>
+    <div class="field"><label for="gstin">Buyer GSTIN</label><input id="gstin" type="text" name="gstin" value="{{ gstin }}" maxlength="15" autocapitalize="characters" placeholder="09ABCDE1234F1Z5"><div class="help">Printed on the invoice for input tax credit. Billed to: {{ user.company_name }}.</div></div>
+    {% endif %}
+
+    <h2 style="font-size:1.4rem;margin-top:1.8rem">2. Payment</h2>
+    {% for code, label, hint in methods %}<label class="opt"><input type="radio" name="payment_method" value="{{ code }}" {% if method == code %}checked{% endif %}><span><b>{{ label }}</b><span class="small muted">{{ hint }}</span></span></label>{% endfor %}
+    <div class="field" style="margin-top:1rem"><label for="notes">Note for us (optional)</label><textarea id="notes" name="notes" rows="2" maxlength="500" placeholder="Delivery instructions, preferred courier, etc."></textarea></div>
+  </div>
+  <aside class="summary card stitch">
+    <h2 style="font-size:1.3rem">Your order</h2>
+    {% for l in lines %}<div class="row small"><span>{{ l.qty }} × {{ l.product.name }} ({{ l.size }})</span><span>₹{{ l.line_total|intcomma }}</span></div>{% endfor %}
+    <hr style="border:0;border-top:1px dashed var(--line)">
+    {% include "orders/_summary.html" %}
+    <button class="btn btn-block" style="margin-top:1rem" type="submit">Place order</button>
+    <p class="small muted" style="margin:.8rem 0 0">By placing your order you agree to our <a href="{% url 'core:policy' 'terms' %}">terms of sale</a>.</p>
+  </aside>
+</form>
+{% endblock %}

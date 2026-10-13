@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static humanize %}
+{% block title %}F.F Manufacturer | Premium Leather Belts for Men and Women, Kanpur{% endblock %}
+{% block description %}Buy premium leather belts direct from the maker in Jajmau, Kanpur. Retail and wholesale tier pricing, GST invoice, pan-India shipping.{% endblock %}
+{% block head %}<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"{{ SITE.company_name|escapejs }}","url":"{{ request.scheme }}://{{ request.get_host }}/","logo":"{{ request.scheme }}://{{ request.get_host }}{% static 'img/icon-512.png' %}","telephone":"+91{{ SITE.phone_primary }}","email":"{{ SITE.email|escapejs }}","address":{"@type":"PostalAddress","streetAddress":"{{ SITE.address|escapejs }}","addressCountry":"IN"}}</script>{% endblock %}
+{% block content %}
+<section class="hero dark">
+  <div class="container">
+    <div>
+      <h1>Belts made where leather is made.</h1>
+      <p class="lead">F.F Manufacturer cuts, stitches and finishes premium leather belts for men and women in Jajmau, Kanpur. Buy one for yourself, or a hundred for your shop.</p>
+      <div class="actions">
+        <a class="btn btn-brass" href="{% url 'store:catalog' %}">Shop belts</a>
+        <a class="btn btn-ghost" href="{% url 'core:bulk_enquiry' %}">Get wholesale prices</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <figure class="a stitch"><img src="{% static 'seed/casual-vintage.webp' %}" alt="Vintage-finish casual leather belt with brass buckle" width="479" height="654" fetchpriority="high" decoding="async"></figure>
+      <figure class="b stitch"><img src="{% static 'seed/tan-executive.webp' %}" alt="Tan executive leather belt" width="591" height="321" decoding="async"></figure>
+      <span class="tag">Saddle-stitched in Kanpur</span>
+    </div>
+  </div>
+</section>
+<div class="strap"><div class="container"><ul>
+  <li>GST invoice on every order</li><li>Wholesale tier prices for businesses</li><li>Ships across India from Kanpur</li><li>Pay online, cash on delivery or bank transfer</li>
+</ul></div></div>
+
+{% if home_categories %}
+<section class="section"><div class="container">
+  <div class="section-head"><h2>Shop by style</h2><a href="{% url 'store:catalog' %}">View all belts</a></div>
+  <div class="tiles">
+    {% for c in home_categories %}<a class="tile stitch" href="{{ c.get_absolute_url }}">{% if c.image %}<img src="{{ c.image.url }}" alt="{{ c.name }} leather belts" width="400" height="500" loading="lazy" decoding="async">{% endif %}<span>{{ c.name }}<small>{{ c.get_gender_display }}</small></span></a>{% endfor %}
+  </div>
+</div></section>
+{% endif %}
+
+{% if featured %}
+<section class="section" style="padding-top:0"><div class="container">
+  <div class="section-head"><h2>Featured belts</h2><a href="{% url 'store:catalog' %}">See the full range</a></div>
+  <div class="grid-products">{% for p in featured %}{% include "partials/product_card.html" %}{% endfor %}</div>
+</div></section>
+{% endif %}
+
+<section class="section dark trade"><div class="container">
+  <div>
+    <h2>Stocking a shop? Buy by the dozen.</h2>
+    <p>Business accounts see tier prices on every belt, starting from 12 pieces. You get GST invoices with your GSTIN, and free shipping on larger orders.</p>
+    <ol class="steps">
+      <li><div><b>Register as a business</b>Add your company name and GSTIN.</div></li>
+      <li><div><b>We verify your GSTIN</b>Usually within one working day.</div></li>
+      <li><div><b>See wholesale prices</b>Tier pricing appears on every product and in your cart.</div></li>
+    </ol>
+    <div class="actions" style="display:flex;gap:.8rem;flex-wrap:wrap"><a class="btn btn-brass" href="{% url 'accounts:register' %}?type=business">Open a business account</a><a class="btn btn-ghost" href="{% url 'core:bulk_enquiry' %}">Send a bulk enquiry</a></div>
+  </div>
+  <div class="photo-frame stitch"><img src="{% static 'seed/colour-wall.webp' %}" alt="Rows of leather belts in many colours and buckle finishes" width="483" height="654" loading="lazy" decoding="async"></div>
+</div></section>
+
+{% if new_in %}
+<section class="section"><div class="container">
+  <div class="section-head"><h2>New in the workshop</h2></div>
+  <div class="grid-products">{% for p in new_in %}{% include "partials/product_card.html" %}{% endfor %}</div>
+</div></section>
+{% endif %}
+
+<section class="section" style="padding-top:0"><div class="container">
+  <div class="card stitch" style="display:flex;gap:1.5rem;align-items:center;justify-content:space-between;flex-wrap:wrap">
+    <div><h2 style="margin:0 0 .3rem">Need a particular colour, size run or buckle?</h2><p class="muted" style="margin:0">Tell us what you need in a wholesale enquiry and we will call you back.</p></div>
+    <a class="btn" href="{% url 'core:bulk_enquiry' %}">Send an enquiry</a>
+  </div>
+</div></section>
+{% endblock %}

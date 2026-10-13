@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Pay for order {{ order.order_number }} | F.F Manufacturer{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block description %}Pay for your F.F Manufacturer order.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block content %}
+<div class="container form-narrow section center">
+  <h1>Pay ₹{{ order.total|intcomma }}</h1>
+  <p class="muted">Order {{ order.order_number }}. Your belts are reserved while you pay.</p>
+  {% if demo %}
+    <div class="notice" style="text-align:left"><b>Demo mode.</b> No Razorpay keys are set, so no real payment will happen. Add <code>RAZORPAY_KEY_ID</code> and <code>RAZORPAY_KEY_SECRET</code> to go live.</div>
+    <form method="post" action="{% url 'orders:demo_pay' order.order_number %}">{% csrf_token %}<button class="btn btn-block" type="submit">Simulate successful payment</button></form>
+  {% else %}
+    <button id="pay-btn" class="btn btn-block" type="button">Pay securely with Razorpay</button>
+    <p class="small muted" style="margin-top:1rem">UPI, cards, netbanking and wallets. Your card details never touch our server.</p>
+    <form id="rzp-form" method="post" action="{% url 'orders:verify' %}">{% csrf_token %}
+      <input type="hidden" name="razorpay_payment_id" id="rzp_pid"><input type="hidden" name="razorpay_order_id" id="rzp_oid"><input type="hidden" name="razorpay_signature" id="rzp_sig"></form>
+  {% endif %}
+  <p style="margin-top:1.5rem"><a href="{% url 'orders:detail' order.order_number %}">Pay later from my orders</a></p>
+</div>
+{% endblock %}
+{% block scripts %}{% if not demo %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script nonce="{{ csp_nonce }}">
+(function () {
+  var options = {
+    key: "{{ key_id|escapejs }}", amount: "{{ amount }}", currency: "INR", name: "F.F Manufacturer",
+    description: "Order {{ order.order_number|escapejs }}", order_id: "{{ rzp_order_id|escapejs }}",
+    prefill: { name: "{{ order.ship_name|escapejs }}", email: "{{ order.user.email|escapejs }}", contact: "{{ order.ship_phone }}" },
+    theme: { color: "#a85f28" },
+    handler: function (r) {
+      document.getElementById('rzp_pid').value = r.razorpay_payment_id;
+      document.getElementById('rzp_oid').value = r.razorpay_order_id;
+      document.getElementById('rzp_sig').value = r.razorpay_signature;
+      document.getElementById('rzp-form').submit();
+    }
+  };
+  var open = function () { new Razorpay(options).open(); };
+  document.getElementById('pay-btn').addEventListener('click', open);
+  window.addEventListener('load', open);
+})();
+</script>{% endif %}{% endblock %}

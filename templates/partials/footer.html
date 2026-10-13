@@ -1,0 +1,31 @@
+<footer class="site-footer dark no-print">
+  <div class="container cols">
+    <div>
+      <h4>{{ SITE.company_name|default:"F.F Manufacturer" }}</h4>
+      <p>{{ SITE.tagline }}. Cut, stitched and finished in Jajmau, Kanpur.</p>
+      {% if SITE %}<p class="small">{{ SITE.address }}<br>
+      <a href="tel:+91{{ SITE.phone_primary }}">{{ SITE.phone_primary }}</a>{% if SITE.phone_secondary %} · <a href="tel:+91{{ SITE.phone_secondary }}">{{ SITE.phone_secondary }}</a>{% endif %}<br>
+      {% if SITE.gstin %}GSTIN: {{ SITE.gstin }}{% endif %}</p>{% endif %}
+    </div>
+    <div><h4>Shop</h4><ul>
+      <li><a href="{% url 'store:catalog' %}?gender=men">Men's belts</a></li>
+      <li><a href="{% url 'store:catalog' %}?gender=women">Women's belts</a></li>
+      <li><a href="{% url 'store:catalog' %}">All belts</a></li>
+      <li><a href="{% url 'orders:track' %}">Track an order</a></li>
+    </ul></div>
+    <div><h4>For business</h4><ul>
+      <li><a href="{% url 'core:bulk_enquiry' %}">Wholesale enquiry</a></li>
+      <li><a href="{% url 'accounts:register' %}">Register a business account</a></li>
+      <li><a href="{% url 'core:contact' %}">Contact us</a></li>
+      <li><a href="{% url 'core:about' %}">About us</a></li>
+    </ul></div>
+    <div><h4>Policies</h4><ul>
+      <li><a href="{% url 'core:policy' 'shipping-policy' %}">Shipping</a></li>
+      <li><a href="{% url 'core:policy' 'returns' %}">Returns and refunds</a></li>
+      <li><a href="{% url 'core:policy' 'terms' %}">Terms and conditions</a></li>
+      <li><a href="{% url 'core:policy' 'privacy' %}">Privacy policy</a></li>
+      <li><a href="#" data-cookie-settings>Cookie settings</a></li>
+    </ul></div>
+  </div>
+  <div class="container legal"><span>© {% now "Y" %} {{ SITE.company_name|default:"F.F Manufacturer" }}. All prices include GST.</span><span>Payments secured by Razorpay</span></div>
+</footer>

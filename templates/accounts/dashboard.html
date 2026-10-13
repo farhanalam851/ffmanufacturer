@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}My dashboard | F.F Manufacturer{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block description %}Your F.F Manufacturer account dashboard.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block content %}
+<div class="container dash">
+  {% include "partials/dash_nav.html" %}
+  <div>
+    <h1 style="font-size:2rem">Hello, {{ user.first_name|default:"there" }}</h1>
+    {% if user.is_business %}
+      {% if user.business_verified %}<p><span class="badge ok">Verified business</span> {{ user.company_name }} · GSTIN {{ user.gstin }}. Wholesale tier prices are active.</p>
+      {% else %}<div class="notice"><b>GSTIN verification pending.</b> We are checking {{ user.gstin|default:"your details" }}. Wholesale prices unlock once it is approved. <a href="{% url 'accounts:profile' %}">Update business details</a></div>{% endif %}
+    {% endif %}
+    {% for o in unpaid %}<div class="notice">Order <b>{{ o.order_number }}</b> (₹{{ o.total|intcomma }}) is waiting for payment. <a href="{% url 'orders:pay' o.order_number %}">Pay now</a></div>{% endfor %}
+    <div class="kpis">
+      <div class="kpi"><span class="v">{{ stats.orders }}</span><span class="l">Orders placed</span></div>
+      <div class="kpi"><span class="v">{{ stats.open }}</span><span class="l">Orders in progress</span></div>
+      <div class="kpi"><span class="v">₹{{ stats.spent|floatformat:0|intcomma }}</span><span class="l">Total spent</span></div>
+      <div class="kpi"><span class="v">{{ stats.wishlist }}</span><span class="l">Saved belts</span></div>
+    </div>
+    <div class="section-head"><h2 style="font-size:1.4rem">Recent orders</h2><a href="{% url 'orders:list' %}">All orders</a></div>
+    {% if recent %}{% include "orders/_order_table.html" with orders=recent %}
+    {% else %}<div class="card empty"><h3>No orders yet</h3><p class="muted">Your orders and invoices will appear here.</p><a class="btn" href="{% url 'store:catalog' %}">Shop belts</a></div>{% endif %}
+  </div>
+</div>
+{% endblock %}

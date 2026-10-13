@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}My orders | F.F Manufacturer{% endblock %}
+{% block sticky_cta %}{% endblock %}
+{% block description %}Your F.F Manufacturer orders.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block content %}
+<div class="container dash">{% include "partials/dash_nav.html" %}
+  <div><h1 style="font-size:2rem">My orders</h1>
+    <form method="get" style="margin-bottom:1rem;max-width:260px"><label class="sr-only" for="st">Filter by status</label><select id="st" name="status" onchange="this.form.submit()"><option value="">All statuses</option>{% for k, v in statuses %}<option value="{{ k }}" {% if k == status %}selected{% endif %}>{{ v }}</option>{% endfor %}</select></form>
+    {% if orders %}{% include "orders/_order_table.html" %}{% else %}<div class="card empty"><h3>No orders here</h3><a class="btn" href="{% url 'store:catalog' %}">Shop belts</a></div>{% endif %}
+  </div>
+</div>
+{% endblock %}
